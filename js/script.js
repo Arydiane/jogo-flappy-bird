@@ -62,12 +62,30 @@ const chao = {
     }
 }
 
+const flappyBird = {
+    spriteX: 0,
+    spriteY: 0,
+    largura: 33, 
+    altura: 24, 
+    x: 10, 
+    y: 50, 
 
+    desenha: function () {
+        context.drawImage(
+            sprites, 
+            flappyBird.spriteX, flappyBird.spriteY, 
+            flappyBird.largura, flappyBird.altura, 
+            flappyBird.x, flappyBird.y, 
+            flappyBird.largura, flappyBird.altura, 
+        ); 
+    }
+}
 
 function loop() {
 
     planoDeFundo.desenha(); 
     chao.desenha(); 
+    flappyBird.desenha(); 
 
     requestAnimationFrame(loop);
 }
