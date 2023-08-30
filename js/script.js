@@ -138,7 +138,7 @@ function criaFlappyBird() {
         },
         pula: function () {
             flappyBird.velocidade = -flappyBird.pulo;
-            som_PULO.play(); 
+            som_PULO.play();
         }
     }
 
@@ -235,7 +235,7 @@ function criaCanos() {
 
                 if (canos.temColisaoComFlappyBird(par)) {
                     console.log("Voce perdeu");
-                    som_HIT.play(); 
+                    som_HIT.play();
                     mudaParaTela(Telas.GAME_OVER);
                 }
 
@@ -271,6 +271,22 @@ function criaCanos() {
 function criaPlacar() {
     const placar = {
         pontuacao: 0,
+        medalha: {
+            largura: 44,
+            altura: 44,
+            ouro: {
+                x: 0,
+                y: 124,
+            },
+            prata: {
+                x: 0,
+                y: 79,
+            },
+            bronze: {
+                x: 48,
+                y: 124,
+            }
+        },
 
         atualiza: function () {
             const intervaloDeFrames = 20;
@@ -280,11 +296,32 @@ function criaPlacar() {
                 placar.pontuacao++
             }
         },
-        desenha: function () {
+        desenha: function (x = canvas.width - 10, y = 35) {
             context.fillStyle = 'white';
             context.textAlign = 'right';
             context.font = '35px "VT323"';
-            context.fillText(`${placar.pontuacao}`, canvas.width - 10, 35);
+            context.fillText(`${placar.pontuacao}`, x, y);
+        },
+        desenhaMedalha: function () {
+            let medalhaConquistada;
+
+            //verifica a medalha conquistada
+            if (placar.pontuacao <= 5) {
+                medalhaConquistada = this.medalha.bronze;
+            } else if (placar.pontuacao < 20) {
+                medalhaConquistada = this.medalha.prata
+            } else {
+                medalhaConquistada = this.medalha.ouro;
+            }
+
+            //desenha medalha conquistada na tela
+            context.drawImage(
+                sprites,
+                medalhaConquistada.x, medalhaConquistada.y,
+                this.medalha.largura, this.medalha.altura,
+                72, 135, //posição na tela game over
+                this.medalha.largura, this.medalha.altura,
+            )
         }
     }
 
@@ -309,6 +346,7 @@ const mensagemGameOver = {
         );
     }
 }
+
 
 const Telas = {
     INICIO: {
@@ -355,11 +393,27 @@ const Telas = {
         atualiza: function () {
 
         },
-        click: function () {
-            mudaParaTela(Telas.INICIO); 
+        click: function (evento) {
+            //captura o clique do mouse
+            const mouseX = evento.pageX - canvas.offsetLeft;
+            const mouseY = evento.pageY - canvas.offsetTop;
+
+            //botão start tem largura = 82 e altura = 28
+            //posicionamento inicial do botão na tela
+            const botaoX = (canvas.width / 2) - 41;
+            const botaoY = 220;
+
+            //verifica se o clique foi dentro da area do botão start
+            if (mouseX >= botaoX && mouseX <= (botaoX + 82)) {
+                if (mouseY >= botaoY && mouseY <= (botaoY + 28)) {
+                    mudaParaTela(Telas.INICIO);
+                }
+            }
         },
         desenha: function () {
-            mensagemGameOver.desenha(); 
+            mensagemGameOver.desenha();
+            globais.placar.desenha(canvas.width - 80, 148);
+            globais.placar.desenhaMedalha();
         }
     }
 }
@@ -392,9 +446,9 @@ function loop() {
     requestAnimationFrame(loop);
 }
 
-window.addEventListener('click', () => {
+window.addEventListener('click', (e) => {
     if (telaAtiva.click) {
-        telaAtiva.click();
+        telaAtiva.click(e);
     }
 })
 
