@@ -50,13 +50,14 @@ function criaChao() {
         y: canvas.height - 112,
 
         atualiza: function () {
-
             const movimentoDoChao = 1; 
             const repeteEm = chao.largura / 2; 
-            const movimentacao = chao.x - movimentoDoChao; 
-            
-            //resto da divisão
-            chao.x = movimentacao % repeteEm; 
+
+            if( chao.x <= -repeteEm) {
+                return chao.x = 0; 
+            }
+
+            chao.x = chao.x - movimentoDoChao; 
         },
         desenha: function () {
             
