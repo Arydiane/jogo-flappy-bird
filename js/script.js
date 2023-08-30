@@ -166,11 +166,119 @@ const mensagemGetReady = {
     }
 }
 
+function criaCanos() {
+    const canos = {
+        largura: 52,
+        altura: 400,
+        chao: {
+            spriteX: 0,
+            spriteY: 169
+        },
+        ceu: {
+            spriteX: 52,
+            spriteY: 169,
+        },
+        espaco: 80,
+        pares: [],
+
+        desenha: function () {
+
+            canos.pares.forEach(function (par) {
+                const yRandom = par.y;
+                const espacamentoEntreCanos = 90;
+
+                const canoCeuX = par.x;
+                const canoCeuY = yRandom;
+                //Cano do céu
+                context.drawImage(
+                    sprites,
+                    canos.ceu.spriteX, canos.ceu.spriteY,
+                    canos.largura, canos.altura,
+                    canoCeuX, canoCeuY,
+                    canos.largura, canos.altura,
+                );
+
+                const canoChaoX = par.x;
+                const canoChaoY = canos.altura + espacamentoEntreCanos + yRandom;
+                //Cano do chão
+                context.drawImage(
+                    sprites,
+                    canos.chao.spriteX, canos.chao.spriteY,
+                    canos.largura, canos.altura,
+                    canoChaoX, canoChaoY,
+                    canos.largura, canos.altura,
+                );
+
+                par.canoCeu = {
+                    x: canoCeuX,
+                    y: canos.altura + canoCeuY
+                }
+
+                par.canoChao = {
+                    x: canoChaoX,
+                    y: canoChaoY
+                }
+            })
+        },
+
+        atualiza: function () {
+
+            const passou100Frames = frames % 100 === 0;
+
+            //criar novos pares de canos a cada 100 frames
+            if (passou100Frames) {
+                canos.pares.push({
+                    x: canvas.width,
+                    y: -150 * (Math.random() + 1),
+                })
+            }
+
+            //movimenta pares de canos na tela
+            canos.pares.forEach(function (par) {
+                par.x = par.x - 2;
+
+                if (canos.temColisaoComFlappyBird(par)) {
+                    console.log("Voce perdeu");
+                    mudaParaTela(Telas.INICIO);
+                }
+
+                //verifica se o cano saiu da tela e retira do array
+                if (par.x + canos.largura <= 0) {
+                    canos.pares.shift();
+                }
+            })
+        },
+
+        temColisaoComFlappyBird: function (par) {
+
+            const cabecaDoFlappy = globais.flappyBird.y;
+            const peDoFlappy = globais.flappyBird.y + globais.flappyBird.altura;
+
+            if (globais.flappyBird.x >= par.x) {
+                //se passarinho invadiu a area dos canos
+                if (cabecaDoFlappy <= par.canoCeu.y) {
+                    return true;
+                }
+
+                if (peDoFlappy >= par.canoChao.y) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    return canos;
+}
+
+
 const Telas = {
     INICIO: {
         inicializa: function () {
             globais.flappyBird = criaFlappyBird();
             globais.chao = criaChao();
+            globais.canos = criaCanos();
         },
         atualiza: function () {
             globais.chao.atualiza();
@@ -187,14 +295,16 @@ const Telas = {
     },
     JOGO: {
         atualiza: function () {
-            globais.flappyBird.atualiza();
+            globais.canos.atualiza();
             globais.chao.atualiza();
+            globais.flappyBird.atualiza();
         },
         click: function () {
             globais.flappyBird.pula();
         },
         desenha: function () {
             planoDeFundo.desenha();
+            globais.canos.desenha();
             globais.chao.desenha();
             globais.flappyBird.desenha();
         }
