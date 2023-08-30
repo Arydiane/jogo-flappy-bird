@@ -272,6 +272,29 @@ function criaCanos() {
     return canos;
 }
 
+function criaPlacar() {
+    const placar = {
+        pontuacao: 0,
+
+        atualiza: function () {
+            const intervaloDeFrames = 20;
+            const passouOIntervalo = frames % intervaloDeFrames === 0;
+
+            if (passouOIntervalo) {
+                placar.pontuacao++
+            }
+        },
+        desenha: function () {
+            context.fillStyle = 'white';
+            context.textAlign = 'right';
+            context.font = '35px "VT323"';
+            context.fillText(`${placar.pontuacao}`, canvas.width - 10, 35);
+        }
+    }
+
+    return placar;
+}
+
 
 const Telas = {
     INICIO: {
@@ -294,10 +317,14 @@ const Telas = {
         }
     },
     JOGO: {
+        inicializa: function () {
+            globais.placar = criaPlacar();
+        },
         atualiza: function () {
             globais.canos.atualiza();
             globais.chao.atualiza();
             globais.flappyBird.atualiza();
+            globais.placar.atualiza();
         },
         click: function () {
             globais.flappyBird.pula();
@@ -307,6 +334,7 @@ const Telas = {
             globais.canos.desenha();
             globais.chao.desenha();
             globais.flappyBird.desenha();
+            globais.placar.desenha();
         }
     }
 }
