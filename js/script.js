@@ -7,7 +7,7 @@ sprites.src = 'img/sprites.png';
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 
-let telaAtiva = {}, globais = {};
+let telaAtiva = {}, globais = {}, frames = 0;
 
 const planoDeFundo = {
     spriteX: 390,
@@ -48,7 +48,7 @@ function criaChao() {
         altura: 112,
         x: 0,
         y: canvas.height - 112,
-        
+
         atualiza: function () {
 
             const movimentoDoChao = 1; 
@@ -91,6 +91,25 @@ function criaFlappyBird() {
         velocidade: 0,
         gravidade: 0.25,
         pulo: 4.6,
+        movimentos: [
+            { spriteX: 0, spriteY: 0, }, //asa para cima
+            { spriteX: 0, spriteY: 26, }, //asa no meio
+            { spriteX: 0, spriteY: 52, }, //asa para baixo
+        ], 
+        frameAtual: 0, 
+
+        atualizarOFrameAtual: function () {
+            
+            const intervaloDeFrames = 10; 
+            const passouOIntervalo = frames % intervaloDeFrames === 0; 
+
+            if (passouOIntervalo) {
+                const baseDoIncremento = 1; 
+                const incremento =  baseDoIncremento + flappyBird.frameAtual; 
+                const baseRepeticao = flappyBird.movimentos.length; 
+                flappyBird.frameAtual = incremento % baseRepeticao; 
+            }
+        }, 
 
         atualiza: function () {
 
@@ -107,10 +126,12 @@ function criaFlappyBird() {
             flappyBird.y = flappyBird.y + flappyBird.velocidade;
         },
         desenha: function () {
+            flappyBird.atualizarOFrameAtual(); 
 
+            const { spriteX, spriteY } = flappyBird.movimentos[flappyBird.frameAtual]; 
             context.drawImage(
                 sprites,
-                flappyBird.spriteX, flappyBird.spriteY,
+                spriteX, spriteY,
                 flappyBird.largura, flappyBird.altura,
                 flappyBird.x, flappyBird.y,
                 flappyBird.largura, flappyBird.altura,
@@ -202,6 +223,7 @@ function loop() {
     telaAtiva.desenha();
     telaAtiva.atualiza();
 
+    frames++; 
     requestAnimationFrame(loop);
 }
 
