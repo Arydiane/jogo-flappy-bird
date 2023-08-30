@@ -1,13 +1,16 @@
+const som_PULO = new Audio();
+som_PULO.src = 'sound/pulo.wav';
+
 const som_HIT = new Audio();
 som_HIT.src = 'sound/hit.wav';
 
 const sprites = new Image();
 sprites.src = 'img/sprites.png';
 
+let telaAtiva = {}, globais = {}, frames = 0;
+
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
-
-let telaAtiva = {}, globais = {}, frames = 0;
 
 const planoDeFundo = {
     spriteX: 390,
@@ -100,7 +103,6 @@ function criaFlappyBird() {
         frameAtual: 0,
 
         atualizarOFrameAtual: function () {
-
             const intervaloDeFrames = 10;
             const passouOIntervalo = frames % intervaloDeFrames === 0;
 
@@ -113,14 +115,10 @@ function criaFlappyBird() {
         },
 
         atualiza: function () {
-
             if (fazColisao(flappyBird, globais.chao)) {
                 som_HIT.play();
-                setTimeout(() => {
-                    mudaParaTela(Telas.INICIO)
-                }, 500)
-
-                return
+                mudaParaTela(Telas.GAME_OVER);
+                return;
             }
 
             flappyBird.velocidade = flappyBird.velocidade + flappyBird.gravidade;
@@ -139,8 +137,8 @@ function criaFlappyBird() {
             );
         },
         pula: function () {
-
-            flappyBird.velocidade = -flappyBird.pulo
+            flappyBird.velocidade = -flappyBird.pulo;
+            som_PULO.play(); 
         }
     }
 
@@ -182,7 +180,6 @@ function criaCanos() {
         pares: [],
 
         desenha: function () {
-
             canos.pares.forEach(function (par) {
                 const yRandom = par.y;
                 const espacamentoEntreCanos = 90;
@@ -222,7 +219,6 @@ function criaCanos() {
         },
 
         atualiza: function () {
-
             const passou100Frames = frames % 100 === 0;
 
             //criar novos pares de canos a cada 100 frames
@@ -239,22 +235,22 @@ function criaCanos() {
 
                 if (canos.temColisaoComFlappyBird(par)) {
                     console.log("Voce perdeu");
-                    mudaParaTela(Telas.INICIO);
+                    som_HIT.play(); 
+                    mudaParaTela(Telas.GAME_OVER);
                 }
 
                 //verifica se o cano saiu da tela e retira do array
-                if (par.x + canos.largura <= 0) {
+                if ((par.x + canos.largura) <= 0) {
                     canos.pares.shift();
                 }
             })
         },
 
         temColisaoComFlappyBird: function (par) {
-
             const cabecaDoFlappy = globais.flappyBird.y;
             const peDoFlappy = globais.flappyBird.y + globais.flappyBird.altura;
 
-            if (globais.flappyBird.x >= par.x) {
+            if ((globais.flappyBird.x + globais.flappyBird.largura) >= par.x) {
                 //se passarinho invadiu a area dos canos
                 if (cabecaDoFlappy <= par.canoCeu.y) {
                     return true;
