@@ -1,3 +1,6 @@
+const som_HIT = new Audio();
+som_HIT.src = 'sound/hit.wav';
+
 const sprites = new Image();
 sprites.src = 'img/sprites.png';
 
@@ -79,7 +82,11 @@ function criaFlappyBird() {
         atualiza: function () {
 
             if (fazColisao(flappyBird, chao)) {
-                mudaParaTela(Telas.INICIO)
+                som_HIT.play();
+                setTimeout(() => {
+                    mudaParaTela(Telas.INICIO)
+                }, 500)
+
                 return
             }
 
@@ -128,7 +135,7 @@ const mensagemGetReady = {
 const Telas = {
     INICIO: {
         inicializa: function () {
-            globais.flappyBird = criaFlappyBird(); 
+            globais.flappyBird = criaFlappyBird();
         },
         atualiza: function () {
 
@@ -172,8 +179,8 @@ function fazColisao(flappyBird, chao) {
 function mudaParaTela(novaTela) {
     telaAtiva = novaTela;
 
-    if( telaAtiva.inicializa) {
-        telaAtiva.inicializa(); 
+    if (telaAtiva.inicializa) {
+        telaAtiva.inicializa();
     }
 }
 
