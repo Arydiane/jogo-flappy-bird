@@ -295,6 +295,24 @@ function criaPlacar() {
     return placar;
 }
 
+const mensagemGameOver = {
+    spriteX: 134,
+    spriteY: 153,
+    largura: 226,
+    altura: 200,
+    x: (canvas.width / 2) - 226 / 2,
+    y: 50,
+
+    desenha: function () {
+        context.drawImage(
+            sprites,
+            mensagemGameOver.spriteX, mensagemGameOver.spriteY,
+            mensagemGameOver.largura, mensagemGameOver.altura,
+            mensagemGameOver.x, mensagemGameOver.y,
+            mensagemGameOver.largura, mensagemGameOver.altura,
+        );
+    }
+}
 
 const Telas = {
     INICIO: {
@@ -335,6 +353,17 @@ const Telas = {
             globais.chao.desenha();
             globais.flappyBird.desenha();
             globais.placar.desenha();
+        }
+    },
+    GAME_OVER: {
+        atualiza: function () {
+
+        },
+        click: function () {
+            mudaParaTela(Telas.INICIO); 
+        },
+        desenha: function () {
+            mensagemGameOver.desenha(); 
         }
     }
 }
