@@ -4,7 +4,7 @@ sprites.src = 'img/sprites.png';
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
 
-let telaAtiva = {};
+let telaAtiva = {}, globais = {};
 
 const planoDeFundo = {
     spriteX: 390,
@@ -64,31 +64,47 @@ const chao = {
     }
 }
 
-const flappyBird = {
-    spriteX: 0,
-    spriteY: 0,
-    largura: 33,
-    altura: 24,
-    x: 10,
-    y: 50,
-    velocidade: 0,
-    gravidade: 0.25,
+function criaFlappyBird() {
+    const flappyBird = {
+        spriteX: 0,
+        spriteY: 0,
+        largura: 33,
+        altura: 24,
+        x: 10,
+        y: 50,
+        velocidade: 0,
+        gravidade: 0.25,
+        pulo: 4.6,
 
-    atualiza: function () {
-        flappyBird.velocidade = flappyBird.velocidade + flappyBird.gravidade;
-        flappyBird.y = flappyBird.y + flappyBird.velocidade;
-    },
+        atualiza: function () {
 
-    desenha: function () {
-        context.drawImage(
-            sprites,
-            flappyBird.spriteX, flappyBird.spriteY,
-            flappyBird.largura, flappyBird.altura,
-            flappyBird.x, flappyBird.y,
-            flappyBird.largura, flappyBird.altura,
-        );
+            if (fazColisao(flappyBird, chao)) {
+                mudaParaTela(Telas.INICIO)
+                return
+            }
+
+            flappyBird.velocidade = flappyBird.velocidade + flappyBird.gravidade;
+            flappyBird.y = flappyBird.y + flappyBird.velocidade;
+        },
+        desenha: function () {
+
+            context.drawImage(
+                sprites,
+                flappyBird.spriteX, flappyBird.spriteY,
+                flappyBird.largura, flappyBird.altura,
+                flappyBird.x, flappyBird.y,
+                flappyBird.largura, flappyBird.altura,
+            );
+        },
+        pula: function () {
+
+            flappyBird.velocidade = -flappyBird.pulo
+        }
     }
+
+    return flappyBird;
 }
+
 
 const mensagemGetReady = {
     spriteX: 134,
@@ -111,6 +127,9 @@ const mensagemGetReady = {
 
 const Telas = {
     INICIO: {
+        inicializa: function () {
+            globais.flappyBird = criaFlappyBird(); 
+        },
         atualiza: function () {
 
         },
@@ -120,24 +139,42 @@ const Telas = {
         desenha: function () {
             planoDeFundo.desenha();
             chao.desenha();
-            flappyBird.desenha();
+            globais.flappyBird.desenha();
             mensagemGetReady.desenha();
         }
     },
     JOGO: {
         atualiza: function () {
-            flappyBird.atualiza();
+            globais.flappyBird.atualiza();
+        },
+        click: function () {
+            globais.flappyBird.pula();
         },
         desenha: function () {
             planoDeFundo.desenha();
             chao.desenha();
-            flappyBird.desenha();
+            globais.flappyBird.desenha();
         }
     }
 }
 
+function fazColisao(flappyBird, chao) {
+    const flappyBirdY = flappyBird.y + flappyBird.altura;
+    const chaoY = chao.y;
+
+    if (flappyBirdY >= chaoY) {
+        return true;
+    }
+
+    return false;
+}
+
 function mudaParaTela(novaTela) {
     telaAtiva = novaTela;
+
+    if( telaAtiva.inicializa) {
+        telaAtiva.inicializa(); 
+    }
 }
 
 function loop() {
