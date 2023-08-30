@@ -93,7 +93,7 @@ function criaFlappyBird() {
         x: 10,
         y: 50,
         velocidade: 0,
-        gravidade: 0.25,
+        gravidade: 0.10,
         pulo: 4.6,
         movimentos: [
             { spriteX: 0, spriteY: 0, }, //asa para cima
