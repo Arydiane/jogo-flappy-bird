@@ -94,7 +94,7 @@ function criaFlappyBird() {
         y: 50,
         velocidade: 0,
         gravidade: 0.10,
-        pulo: 4.6,
+        pulo: 3,
         movimentos: [
             { spriteX: 0, spriteY: 0, }, //asa para cima
             { spriteX: 0, spriteY: 26, }, //asa no meio
@@ -176,7 +176,6 @@ function criaCanos() {
             spriteX: 52,
             spriteY: 169,
         },
-        espaco: 80,
         pares: [],
 
         desenha: function () {
@@ -234,7 +233,6 @@ function criaCanos() {
                 par.x = par.x - 2;
 
                 if (canos.temColisaoComFlappyBird(par)) {
-                    console.log("Voce perdeu");
                     som_HIT.play();
                     mudaParaTela(Telas.GAME_OVER);
                 }
@@ -249,15 +247,20 @@ function criaCanos() {
         temColisaoComFlappyBird: function (par) {
             const cabecaDoFlappy = globais.flappyBird.y;
             const peDoFlappy = globais.flappyBird.y + globais.flappyBird.altura;
+            const corpoDoFlappy = globais.flappyBird.x;
 
             if ((globais.flappyBird.x + globais.flappyBird.largura) >= par.x) {
                 //se passarinho invadiu a area dos canos
                 if (cabecaDoFlappy <= par.canoCeu.y) {
-                    return true;
+                    if (corpoDoFlappy <= par.canoCeu.x + this.largura) {
+                        return true;
+                    }
                 }
 
                 if (peDoFlappy >= par.canoChao.y) {
-                    return true;
+                    if (corpoDoFlappy <= par.canoChao.x + this.largura) {
+                        return true;
+                    }
                 }
             }
 
@@ -287,7 +290,6 @@ function criaPlacar() {
                 y: 124,
             }
         },
-
         atualiza: function () {
             const intervaloDeFrames = 20;
             const passouOIntervalo = frames % intervaloDeFrames === 0;
@@ -295,12 +297,14 @@ function criaPlacar() {
             if (passouOIntervalo) {
                 placar.pontuacao++
             }
+
         },
         desenha: function (x = canvas.width - 10, y = 35) {
             context.fillStyle = 'white';
             context.textAlign = 'right';
             context.font = '35px "VT323"';
             context.fillText(`${placar.pontuacao}`, x, y);
+
         },
         desenhaMedalha: function () {
             let medalhaConquistada;
@@ -322,7 +326,8 @@ function criaPlacar() {
                 72, 135, //posição na tela game over
                 this.medalha.largura, this.medalha.altura,
             )
-        }
+        }, 
+     
     }
 
     return placar;
@@ -390,6 +395,7 @@ const Telas = {
         }
     },
     GAME_OVER: {
+   
         atualiza: function () {
 
         },
