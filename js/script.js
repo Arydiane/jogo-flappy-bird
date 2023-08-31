@@ -7,7 +7,7 @@ som_HIT.src = 'sound/hit.wav';
 const sprites = new Image();
 sprites.src = 'img/sprites.png';
 
-let telaAtiva = {}, globais = {}, frames = 0;
+let telaAtiva = {}, globais = {}, frames = 0, historicoPontuacao = [];
 
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
@@ -295,7 +295,7 @@ function criaPlacar() {
             const passouOIntervalo = frames % intervaloDeFrames === 0;
 
             if (passouOIntervalo) {
-                placar.pontuacao++
+                placar.pontuacao++;
             }
 
         },
@@ -313,7 +313,7 @@ function criaPlacar() {
             if (placar.pontuacao <= 5) {
                 medalhaConquistada = this.medalha.bronze;
             } else if (placar.pontuacao < 20) {
-                medalhaConquistada = this.medalha.prata
+                medalhaConquistada = this.medalha.prata;
             } else {
                 medalhaConquistada = this.medalha.ouro;
             }
@@ -326,8 +326,16 @@ function criaPlacar() {
                 72, 135, //posição na tela game over
                 this.medalha.largura, this.medalha.altura,
             )
-        }, 
-     
+        },
+        desenhaMelhorPotuacao: function () {
+            const melhor = melhorPontuacao(historicoPontuacao);
+            
+            //desenha melhor pontuação usada na tela game over
+            context.fillStyle = 'white';
+            context.textAlign = 'right';
+            context.font = '35px "VT323"';
+            context.fillText(`${melhor}`, canvas.width - 80, 190);
+        }
     }
 
     return placar;
@@ -395,7 +403,9 @@ const Telas = {
         }
     },
     GAME_OVER: {
-   
+        inicializa: function () {
+            historicoPontuacao.push(globais.placar.pontuacao);
+        },
         atualiza: function () {
 
         },
@@ -420,8 +430,13 @@ const Telas = {
             mensagemGameOver.desenha();
             globais.placar.desenha(canvas.width - 80, 148);
             globais.placar.desenhaMedalha();
+            globais.placar.desenhaMelhorPotuacao();
         }
     }
+}
+
+function melhorPontuacao(historicoPontos) {
+    return historicoPontos.reduce((max, cur) => Math.max(max, cur), -Infinity);
 }
 
 function fazColisao(flappyBird, chao) {
